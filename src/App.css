@@ -4,6 +4,7 @@
   flex-direction: column;
   gap: 24px;
   padding: 32px;
+  align-items: center;
 }
 
 .dashboard {
@@ -12,6 +13,11 @@
   gap: 20px;
   width: 100%;
   margin: 0 auto;
+  max-width: 1200px;
+}
+
+.content-area {
+  width: 100%;
   max-width: 1200px;
 }
 

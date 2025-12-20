@@ -1,0 +1,68 @@
+.section-shell {
+  background: linear-gradient(140deg, var(--panel), var(--panel-strong));
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+}
+
+.section-shell__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.section-shell__eyebrow {
+  margin: 0;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+  font-size: 0.7rem;
+}
+
+.section-shell h2 {
+  margin: 0;
+  color: var(--text-primary);
+  letter-spacing: 0.03em;
+}
+
+.section-shell__description {
+  margin: 4px 0 0 0;
+  color: var(--text-secondary);
+}
+
+.section-shell__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.section-shell__card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 14px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.section-shell__card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.section-shell__card p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.section-shell__card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(45, 225, 194, 0.3);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
