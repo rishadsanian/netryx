@@ -3,6 +3,7 @@ import { w3cwebsocket } from "websocket";
 
 const STALE_THRESHOLD_MS = 5000;
 const RECONNECT_DELAY_MS = 2000;
+const MAX_POINTS = 120;
 
 function PacketLatency() {
   const [latency, setLatency] = useState(null);
@@ -83,8 +84,14 @@ function PacketLatency() {
     const interval = setInterval(() => {
       if (latencyRef.current !== null) {
         const timestamp = Date.now();
-        setLabels((prev) => [...prev, timestamp]);
-        setDisplayLatency((prev) => [...prev, latencyRef.current]);
+        setLabels((prev) => {
+          const next = [...prev, timestamp];
+          return next.length > MAX_POINTS ? next.slice(next.length - MAX_POINTS) : next;
+        });
+        setDisplayLatency((prev) => {
+          const next = [...prev, latencyRef.current];
+          return next.length > MAX_POINTS ? next.slice(next.length - MAX_POINTS) : next;
+        });
       }
     }, 1000);
 
