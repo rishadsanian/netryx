@@ -14,20 +14,20 @@ function App() {
   const widget1 = {
     heading: "Public IPV4 Address ",
     data: ipv4,
-    width: "60vh",
+    width: "100%",
     status: ipv4status,
   };
   const widget2 = {
     heading: "Public IPV6 Address",
     data: ipv6,
-    width: "60vh",
+    width: "100%",
     status: ipv6status,
   };
   const widget3 = {
     heading: "Latency (ms)",
     data: latency,
     data2: <LatencyChart labels={labels} displayLatency={displayLatency} />,
-    width: "75vh",
+    width: "100%",
     status: latencyStatus,
     // labels: labels,
     // displayLatency: displayLatency,

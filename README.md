@@ -1,4 +1,4 @@
-# Sextant
+# NETRYX
 
 Netryx is a real-time network monitoring dashboard built with React and Node.js. It provides a simple interface to monitor your public IP addresses (IPv4 and IPv6) and packet latency to a WebSocket server.
 

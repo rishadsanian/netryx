@@ -1,128 +1,138 @@
-/* Base styles for larger screens */
 .widget {
-  background: rgba(0, 0, 0, 0.7);
-  /* width: 40%; */
-  border-radius: 10px;
-  padding: 20px;
-  margin: 20px;
-  transition: transform 0.2s ease;
-  backdrop-filter: blur(5px);
+  position: relative;
+  background: linear-gradient(140deg, var(--panel), var(--panel-strong));
+  border-radius: 18px;
+  padding: 18px 18px 16px 18px;
+  border: 1px solid var(--border-strong);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.widget::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(45, 225, 194, 0.12), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
 .widget:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 188, 235, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 38px rgba(0, 0, 0, 0.4);
+  border-color: rgba(45, 225, 194, 0.25);
 }
 
-header {
+.widget:hover::after {
+  opacity: 1;
+}
+
+.widget header {
   display: flex;
   flex-direction: row;
-  align-items:flex-start;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .widget h2 {
-  font-size: 1.5em;
-  color: #00BCEB;
+  font-size: 1.15rem;
+  color: var(--text-primary);
   text-align: left;
-  margin-top: 0;
-  padding-bottom: 5px;
+  margin: 0;
+  letter-spacing: 0.02em;
 }
 
 .widget .value {
-  font-size: 1.5em;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
-  padding: 10px;
-  margin: 10px 0;
-  overflow-wrap: break-word; /* Wrap long words to avoid overflow */
+  font-size: 1.4rem;
+  color: var(--accent-soft);
+  background: var(--muted);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 10px 0 12px 0;
+  overflow-wrap: break-word;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .widget .value:hover {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .status-symbol {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  margin-right: 10px;
-  margin-top:2.5px
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.05);
 }
 
-/* Green status symbol */
 .status-symbol-green {
-  width: 20px;
-  height: 20px;
-  background: rgba(0, 255, 0, 0.7);
+  background: radial-gradient(circle, #00ff9c 40%, rgba(0, 255, 156, 0.35));
   animation: glow-green 2s infinite alternate;
 }
 
-/* Red status symbol */
 .status-symbol-red {
-  width: 20px;
-  height: 20px;
-  background: rgba(255, 0, 0, 0.7);
+  background: radial-gradient(circle, #ff5e5e 40%, rgba(255, 94, 94, 0.35));
   animation: glow-red 2s infinite alternate;
 }
 
 .status-symbol-off {
-  width: 20px;
-  height: 20px;
-  background: rgba(128, 128, 128, 0.157); /* Gray background for the muted status symbol */
+  background: radial-gradient(circle, #6b7584 40%, rgba(107, 117, 132, 0.35));
   animation: glow-muted 2s infinite alternate;
 }
 
 @keyframes glow-green {
   from {
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 6px rgba(0, 255, 156, 0.4), 0 0 0 6px rgba(0, 255, 156, 0.08);
   }
   to {
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 14px rgba(0, 255, 156, 0.6), 0 0 0 8px rgba(0, 255, 156, 0.12);
   }
 }
 
 @keyframes glow-red {
   from {
-    box-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+    box-shadow: 0 0 6px rgba(255, 94, 94, 0.4), 0 0 0 6px rgba(255, 94, 94, 0.08);
   }
   to {
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    box-shadow: 0 0 14px rgba(255, 94, 94, 0.6), 0 0 0 8px rgba(255, 94, 94, 0.12);
   }
 }
 
 @keyframes glow-muted {
   from {
-    box-shadow: 0 0 5px rgba(128, 128, 128, 0.5); /* A lighter gray for the shadow */
+    box-shadow: 0 0 6px rgba(107, 117, 132, 0.4), 0 0 0 6px rgba(107, 117, 132, 0.08);
   }
   to {
-    box-shadow: 0 0 10px rgba(128, 128, 128, 0.5); /* A slightly darker gray for the shadow */
+    box-shadow: 0 0 12px rgba(107, 117, 132, 0.5), 0 0 0 8px rgba(107, 117, 132, 0.1);
   }
 }
 
-/* Media query for smaller screens */
+.chart {
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .widget {
     width: 100%;
-    border-radius: 0;
+    border-radius: 14px;
   }
-  
+
   .widget h2 {
-    font-size: 1em;
-    padding-bottom: 5px;
+    font-size: 1rem;
   }
-  
-  .widget p {
-    font-size: 1em;
-    border-radius: 0;
-    margin: 5px 0;
+
+  .widget .value {
+    font-size: 1.15rem;
   }
-  
+
   .status-symbol {
-    width: 15px;
-    height: 15px;
-    margin-right: 5px;
+    width: 12px;
+    height: 12px;
   }
 }

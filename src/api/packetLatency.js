@@ -1,73 +1,108 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { w3cwebsocket } from "websocket";
+
+const STALE_THRESHOLD_MS = 5000;
+const RECONNECT_DELAY_MS = 2000;
 
 function PacketLatency() {
   const [latency, setLatency] = useState(null);
   const [latencyStatus, setLatencyStatus] = useState("red");
   const [currentTimestamp, setCurrentTimestamp] = useState(null);
   const [labels, setLabels] = useState([]);
-  const [displayLatency, setDisplayLatency] = useState([]); // latency data to be displayed on chart
+  const [displayLatency, setDisplayLatency] = useState([]);
 
   const latencyRef = useRef(null);
+  const lastMessageRef = useRef(null);
+  const socketRef = useRef(null);
+  const reconnectTimerRef = useRef(null);
 
   useEffect(() => {
-    const client = new w3cwebsocket("ws://localhost:55455");
+    let isMounted = true;
 
-    // Handle incoming messages from the server
-
-    // connect to the server
-    client.onopen = () => {
-      console.log("WebSocket connected");
-      setLatencyStatus("green");
+    const scheduleReconnect = () => {
+      if (reconnectTimerRef.current) return;
+      reconnectTimerRef.current = setTimeout(() => {
+        reconnectTimerRef.current = null;
+        connect();
+      }, RECONNECT_DELAY_MS);
     };
 
-    //incoming messages
-    client.onmessage = (message) => {
-      // console.log("Received message:", message.data);
-      const timestamp = parseInt(message.data);
-      const currentTime = Date.now();
-      setCurrentTimestamp(currentTime);
-      const packetLatency = currentTime - timestamp;
-      // console.log("Calculated latency:", packetLatency);
-      latencyRef.current = packetLatency;
-      setLatency(packetLatency);
-      setLatencyStatus("green");
-      // client.close(); // close connection - to add flicker effect
+    const handleClose = () => {
+      if (!isMounted) return;
+      latencyRef.current = null;
+      setLatency(null);
+      setLatencyStatus("red");
+      scheduleReconnect();
     };
 
-    //closing messages
-    client.onclose = () => {
-      setLatencyStatus("off");
+    const connect = () => {
+      const client = new w3cwebsocket("ws://localhost:55455");
+      socketRef.current = client;
+
+      client.onopen = () => {
+        if (!isMounted) return;
+        setLatencyStatus("green");
+      };
+
+      client.onmessage = (message) => {
+        if (!isMounted) return;
+        const timestamp = parseInt(message.data, 10);
+        const currentTime = Date.now();
+        lastMessageRef.current = currentTime;
+        setCurrentTimestamp(currentTime);
+        const packetLatency = currentTime - timestamp;
+        latencyRef.current = packetLatency;
+        setLatency(packetLatency);
+        setLatencyStatus("green");
+      };
+
+      client.onerror = () => {
+        if (!isMounted) return;
+        setLatencyStatus("red");
+        client.close();
+      };
+
+      client.onclose = handleClose;
+    };
+
+    connect();
+
+    return () => {
+      isMounted = false;
+      if (socketRef.current) {
+        socketRef.current.onclose = null;
+        socketRef.current.close();
+      }
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+      }
     };
   }, []);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     const { currentTimestamp, latency } = PacketLatency();
-  //     // Generate mock data for demonstration
-  //     // const currentTimestamp = new Date().toLocaleTimeString();
-  //     // const latency = Math.floor(Math.random() * 100);
-
-  //     //real data
-  //     console.log(currentTimestamp, latency);
-
-  //     // Update state with the mock data
-  //     setLabels((labels) => [...labels, currentTimestamp]);
-  //     setDisplayLatency((displayLatency) => [...displayLatency, latency]);
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
   useEffect(() => {
-    // console.log("Interval useEffect running");
     const interval = setInterval(() => {
-      // console.log("Interval tick, latency:", latencyRef.current);
       if (latencyRef.current !== null) {
         const timestamp = Date.now();
-        // console.log("Adding chart point:", timestamp, latencyRef.current);
         setLabels((prev) => [...prev, timestamp]);
         setDisplayLatency((prev) => [...prev, latencyRef.current]);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const lastMessageAt = lastMessageRef.current;
+      if (!lastMessageAt) return;
+      const isStale = Date.now() - lastMessageAt > STALE_THRESHOLD_MS;
+      if (isStale) {
+        latencyRef.current = null;
+        setLatency(null);
+        setLatencyStatus("red");
+        if (socketRef.current) {
+          socketRef.current.close();
+        }
       }
     }, 1000);
 

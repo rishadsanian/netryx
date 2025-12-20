@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -79,7 +79,7 @@ const LatencyChart = ({ labels, displayLatency }) => {
   }, [data]);
 
   return (
-    <div className="chart" style={{ width: "70%" }}>
+    <div className="chart">
       <Line ref={chartRef} options={options} data={data} />
     </div>
   );

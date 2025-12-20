@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./Exhibit.css";
 
 function Exhibit({ widget }) {
-  const [statusSymbolClass, setStatusSymbolClass] = useState("");
-
   return (
     <div className="widget" style={{ width: widget.width }}>
       <header>

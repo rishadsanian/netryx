@@ -1,11 +1,22 @@
 .App {
-  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
 }
 
 .dashboard {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 20px;
+  }
 }

@@ -1,16 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+
+:root {
+  --bg: #070b14;
+  --panel: rgba(16, 24, 44, 0.75);
+  --panel-strong: rgba(18, 30, 60, 0.9);
+  --border-strong: rgba(255, 255, 255, 0.09);
+  --text-primary: #e6f1ff;
+  --text-secondary: #9db3ce;
+  --accent-strong: #2de1c2;
+  --accent-soft: #7ed6ff;
+  --muted: rgba(255, 255, 255, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Courier New', monospace; 
-/* dark */
-  background-image: url("https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6Im1fNjk0NjA0ZWFiMWRjODE5MWIxNjY5OGRjOGRhN2ZmZWE6ZmlsZV8wMDAwMDAwMDY1NDg3MjQzODYzMDNkZDM0MDkzODc5OCIsInRzIjoiMjA0NDIiLCJwIjoicHlpIiwiY2lkIjoiMSIsInNpZyI6ImJlNjgwZGJiNTg5MzZkNGFlOGIxZTJhNTc0MjY2NWU2OTcyYzE1MTY1YTZjNjRhNjBiNGYwOWMzOTZlZWMwNTMiLCJ2IjoiMCIsImdpem1vX2lkIjpudWxsLCJjcyI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ=="); 
-
-  /* light
-  background-image: url("https://img.freepik.com/premium-vector/light-blue-circuit-board-chip-technology-background_88343-3396.jpg?w=2000"); */
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  color: #00bceb; /* Bright blue text */
-
-  height: 100vh;
+  font-family: "Space Grotesk", "JetBrains Mono", monospace;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(45, 225, 194, 0.15), transparent 30%),
+    radial-gradient(circle at 85% 10%, rgba(126, 214, 255, 0.12), transparent 30%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 120px 120px, 120px 120px;
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
