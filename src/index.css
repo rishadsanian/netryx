@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Courier New', monospace; 
+/* dark */
+  background-image: url("https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6Im1fNjk0NjA0ZWFiMWRjODE5MWIxNjY5OGRjOGRhN2ZmZWE6ZmlsZV8wMDAwMDAwMDY1NDg3MjQzODYzMDNkZDM0MDkzODc5OCIsInRzIjoiMjA0NDIiLCJwIjoicHlpIiwiY2lkIjoiMSIsInNpZyI6ImJlNjgwZGJiNTg5MzZkNGFlOGIxZTJhNTc0MjY2NWU2OTcyYzE1MTY1YTZjNjRhNjBiNGYwOWMzOTZlZWMwNTMiLCJ2IjoiMCIsImdpem1vX2lkIjpudWxsLCJjcyI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ=="); 
+
+  /* light
+  background-image: url("https://img.freepik.com/premium-vector/light-blue-circuit-board-chip-technology-background_88343-3396.jpg?w=2000"); */
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  color: #00bceb; /* Bright blue text */
+
+  height: 100vh;
+}
