@@ -1,0 +1,53 @@
+.device-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.device-info__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.device-info__card {
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.device-info__label {
+  margin: 0 0 4px 0;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.device-info__value {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.device-info__ua {
+  border: 1px dashed var(--border-strong);
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.device-info__ua-value {
+  margin: 4px 0 0 0;
+  font-family: "JetBrains Mono", monospace;
+  color: var(--text-secondary);
+  word-break: break-word;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .device-info__grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}

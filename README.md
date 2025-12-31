@@ -3,13 +3,15 @@
 Netryx is a real-time network and device operations deck. The landing view shows your public IPs and live packet latency to a local WebSocket server; top-level navigation stubs the roadmap for Devices, Topology, Monitoring, Alerts, Automation, Analytics, and Admin.
 
 ## Features (current)
+- Client device card: detects device type, OS, browser, make/model, cores, memory, screen, and user agent for the viewing client (best-effort; browser-limited).
 - Public IP display (IPv4/IPv6 via ipify) with status chips.
 - Real-time latency stream from the local WebSocket server, charted with a smoothed line and capped history window.
 - Connection resilience: reconnects on socket drops and marks latency stale/red after inactivity.
 - Responsive, themed UI with a command-deck banner and section shells for future panels.
 
 ## Architecture
-- Frontend: React + Chart.js (react-chartjs-2) for visualization.
+- Frontend: React + Chart.js (react-chartjs-2) for visualization and device info display.
+- Device detection: Browser user agent and client hints (best-effort; some fields may be unavailable depending on browser privacy settings).
 - Backend: Node.js WebSocket server (`server.js`) sending timestamps each second.
 - APIs: ipify (IPv4/IPv6) for public address lookup.
 
@@ -29,10 +31,10 @@ node server.js
 ```
 npm start
 ```
-The app opens at `http://localhost:3000` and begins showing IPs and latency once the socket connects.
+The app opens at `http://localhost:3000` and begins showing IPs, latency, and client device details once the socket connects.
 
 ## Navigation shells (roadmap)
-- Overview: IP + latency dashboard (live today).
+- Overview: Client device, IP, and latency dashboard (live today).
 - Devices: inventory, configs, compliance baselines.
 - Topology: maps, dependencies, what-if impact.
 - Monitoring: streams, thresholds, SLOs.
@@ -48,3 +50,7 @@ The app opens at `http://localhost:3000` and begins showing IPs and latency once
 
 ## Tech
 React, Node.js, ws, Chart.js, Axios, react-chartjs-2, websocket.
+
+## Notes
+- Disk capacity is not exposed to browsers; the device card shows browser-visible hardware info only.
+- Some device fields (model, memory, cores) can be hidden by privacy settings; they will show "Unavailable" when not provided.

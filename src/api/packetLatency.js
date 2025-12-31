@@ -72,7 +72,9 @@ function PacketLatency() {
       isMounted = false;
       if (socketRef.current) {
         socketRef.current.onclose = null;
-        socketRef.current.close();
+        if (typeof socketRef.current.close === "function") {
+          socketRef.current.close();
+        }
       }
       if (reconnectTimerRef.current) {
         clearTimeout(reconnectTimerRef.current);

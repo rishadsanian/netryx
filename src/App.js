@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import "./App.css";
 import Banner from "./components/Banner";
 import Exhibit from "./components/Exhibit";
+import DeviceInfo from "./components/DeviceInfo";
 import LatencyChart from "./components/LatencyChart";
 import NavBar from "./components/NavBar";
 import SectionShell from "./components/SectionShell";
 
 import GetIP from "./api/getIp";
 import PacketLatency from "./api/packetLatency";
+import useDeviceInfo from "./api/useDeviceInfo";
 
 function App() {
   const [activeSection, setActiveSection] = useState("Overview");
   const { ipv4, ipv4status, ipv6, ipv6status } = GetIP();
   const { latency, latencyStatus, labels, displayLatency } = PacketLatency();
+  const deviceInfo = useDeviceInfo();
 
   const navItems = [
     "Overview",
@@ -96,6 +99,15 @@ function App() {
     width: "100%",
     status: ipv6status,
   };
+  const widget0 = {
+    heading: "Client device",
+    data: deviceInfo.deviceType
+      ? `${deviceInfo.deviceType} · ${deviceInfo.os || "Unknown OS"}`
+      : "Detecting client...",
+    data2: <DeviceInfo info={deviceInfo} />,
+    width: "100%",
+    status: deviceInfo.deviceType ? "green" : "off",
+  };
   const widget3 = {
     heading: "Latency (ms)",
     data: latency,
@@ -107,10 +119,19 @@ function App() {
   const renderSection = () => {
     if (activeSection === "Overview") {
       return (
-        <div className="dashboard">
-          <Exhibit widget={widget1} />
-          <Exhibit widget={widget2} />
-          <Exhibit widget={widget3} />
+        <div className="dashboard dashboard-overview-grid">
+          <div className="dashboard-col-left">
+            <Exhibit widget={widget0} />
+          </div>
+          <div className="dashboard-col-right">
+            <div className="dashboard-row dashboard-row-split">
+              <Exhibit widget={widget1} />
+              <Exhibit widget={widget2} />
+            </div>
+            <div className="dashboard-row dashboard-row-single">
+              <Exhibit widget={widget3} />
+            </div>
+          </div>
         </div>
       );
     }
