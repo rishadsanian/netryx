@@ -3,6 +3,7 @@ import "./App.css";
 import Banner from "./components/Banner";
 import Exhibit from "./components/Exhibit";
 import DeviceInfo from "./components/DeviceInfo";
+import NetworkInfo from "./components/NetworkInfo";
 import LatencyChart from "./components/LatencyChart";
 import NavBar from "./components/NavBar";
 import SectionShell from "./components/SectionShell";
@@ -10,12 +11,14 @@ import SectionShell from "./components/SectionShell";
 import GetIP from "./api/getIp";
 import PacketLatency from "./api/packetLatency";
 import useDeviceInfo from "./api/useDeviceInfo";
+import useNetworkInfo from "./api/useNetworkInfo";
 
 function App() {
   const [activeSection, setActiveSection] = useState("Overview");
   const { ipv4, ipv4status, ipv6, ipv6status } = GetIP();
   const { latency, latencyStatus, labels, displayLatency } = PacketLatency();
   const deviceInfo = useDeviceInfo();
+  const networkInfo = useNetworkInfo();
 
   const navItems = [
     "Overview",
@@ -109,7 +112,7 @@ function App() {
     status: deviceInfo.deviceType ? "green" : "off",
   };
   const widget3 = {
-    heading: "Latency (ms)",
+    heading: "Server Latency (ms)",
     data: latency,
     data2: <LatencyChart labels={labels} displayLatency={displayLatency} />,
     width: "100%",
@@ -119,18 +122,19 @@ function App() {
   const renderSection = () => {
     if (activeSection === "Overview") {
       return (
-        <div className="dashboard dashboard-overview-grid">
-          <div className="dashboard-col-left">
+        <div className="dashboard">
+          <div className="dashboard-row dashboard-row-single">
             <Exhibit widget={widget0} />
+          
           </div>
-          <div className="dashboard-col-right">
-            <div className="dashboard-row dashboard-row-split">
-              <Exhibit widget={widget1} />
-              <Exhibit widget={widget2} />
-            </div>
-            <div className="dashboard-row dashboard-row-single">
-              <Exhibit widget={widget3} />
-            </div>
+          <div className="dashboard-row dashboard-row-split">
+            <Exhibit widget={widget1} />
+            <Exhibit widget={widget2} />
+          </div>
+          <div className="dashboard-row dashboard-row-split">
+            <Exhibit widget={widget3} />
+              <NetworkInfo networkInfo={networkInfo} />
+
           </div>
         </div>
       );
