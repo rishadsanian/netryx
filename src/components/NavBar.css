@@ -2,7 +2,7 @@
   background: linear-gradient(120deg, rgba(16, 24, 44, 0.9), rgba(20, 37, 68, 0.8));
   border: 1px solid var(--border-strong);
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   display: flex;
   justify-content: center;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
@@ -36,6 +36,27 @@
   border-color: rgba(45, 225, 194, 0.4);
   color: var(--text-primary);
   box-shadow: 0 0 0 6px rgba(45, 225, 194, 0.08);
+}
+
+.navbar__item.is-soon {
+  border-style: dashed;
+}
+
+.navbar__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navbar__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
 }
 
 @media (max-width: 768px) {

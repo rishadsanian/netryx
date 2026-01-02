@@ -3,10 +3,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 22px 26px;
+  padding: 18px 20px;
   background: linear-gradient(120deg, rgba(25, 34, 60, 0.9), rgba(21, 59, 71, 0.7));
   border: 1px solid var(--border-strong);
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   position: relative;
   overflow: hidden;

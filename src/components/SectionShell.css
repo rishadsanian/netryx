@@ -13,12 +13,29 @@
   margin-bottom: 16px;
 }
 
+.section-shell__eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .section-shell__eyebrow {
   margin: 0;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent-soft);
   font-size: 0.7rem;
+}
+
+.section-shell__pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px dashed rgba(45, 225, 194, 0.5);
+  color: var(--text-primary);
+  background: rgba(45, 225, 194, 0.12);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
 }
 
 .section-shell h2 {
@@ -30,6 +47,13 @@
 .section-shell__description {
   margin: 4px 0 0 0;
   color: var(--text-secondary);
+}
+
+.section-shell__note {
+  margin: 6px 0 0 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  opacity: 0.95;
 }
 
 .section-shell__grid {

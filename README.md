@@ -6,8 +6,11 @@ Netryx is a real-time network and device operations deck. The landing view shows
 - Client device card: detects device type, OS, browser, make/model, cores, memory, screen, and user agent for the viewing client (best-effort; browser-limited).
 - Public IP display (IPv4/IPv6 via ipify) with status chips.
 - Real-time latency stream from the local WebSocket server, charted with a smoothed line and capped history window.
+- Network status pill with inline ping and link type when exposed by the browser.
+- Built-in speed test (download x3, upload x1) with median scoring plus jitter; auto-runs on load and can be rerun manually.
+- Environment card: shows timezone, locale/languages, and secure-context status (HTTPS vs not secure).
 - Connection resilience: reconnects on socket drops and marks latency stale/red after inactivity.
-- Responsive, themed UI with a command-deck banner and section shells for future panels.
+- Responsive, themed UI with a command-deck banner and section shells for future panels; non-live sections are labeled “Soon” in the nav and shell header.
 
 ## Architecture
 - Frontend: React + Chart.js (react-chartjs-2) for visualization and device info display.

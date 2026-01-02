@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 
 // Defaults target an external endpoint for a real internet-path test.
 // Override with REACT_APP_SPEEDTEST_DOWNLOAD_URL / REACT_APP_SPEEDTEST_UPLOAD_URL if you prefer another host.
-const DEFAULT_DOWNLOAD_URL = "https://speed.cloudflare.com/__down?bytes=5000000"; // 5MB
+const DEFAULT_DOWNLOAD_URL =
+  "https://speed.cloudflare.com/__down?bytes=5000000"; // 5MB
 const DEFAULT_UPLOAD_URL = "https://speed.cloudflare.com/__up";
 
 function useNetworkInfo() {
@@ -18,18 +19,25 @@ function useNetworkInfo() {
   const [linkStatus, setLinkStatus] = useState("checking"); // checking, online, offline
   const [pingLatency, setPingLatency] = useState(null);
   const autoRunRef = useRef(false);
-  const downloadEndpoint = process.env.REACT_APP_SPEEDTEST_DOWNLOAD_URL || DEFAULT_DOWNLOAD_URL;
-  const uploadEndpoint = process.env.REACT_APP_SPEEDTEST_UPLOAD_URL || DEFAULT_UPLOAD_URL;
+  const downloadEndpoint =
+    process.env.REACT_APP_SPEEDTEST_DOWNLOAD_URL || DEFAULT_DOWNLOAD_URL;
+  const uploadEndpoint =
+    process.env.REACT_APP_SPEEDTEST_UPLOAD_URL || DEFAULT_UPLOAD_URL;
   const isExternal =
-    (typeof downloadEndpoint === "string" && /^https?:\/\//i.test(downloadEndpoint)) ||
-    (typeof uploadEndpoint === "string" && /^https?:\/\//i.test(uploadEndpoint));
+    (typeof downloadEndpoint === "string" &&
+      /^https?:\/\//i.test(downloadEndpoint)) ||
+    (typeof uploadEndpoint === "string" &&
+      /^https?:\/\//i.test(uploadEndpoint));
   const speedTestScope = isExternal
     ? "Internet throughput (external endpoint)"
     : "Local throughput (same origin)";
 
   // Get network information from the Network Information API
   useEffect(() => {
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const connection =
+      navigator.connection ||
+      navigator.mozConnection ||
+      navigator.webkitConnection;
 
     if (connection) {
       setConnectionType(connection.type);
@@ -55,7 +63,11 @@ function useNetworkInfo() {
       const timeout = setTimeout(() => controller.abort(), PING_TIMEOUT_MS);
       const start = performance.now();
       try {
-        const res = await fetch("/", { method: "GET", cache: "no-store", signal: controller.signal });
+        const res = await fetch("/", {
+          method: "GET",
+          cache: "no-store",
+          signal: controller.signal,
+        });
         if (cancelled) return;
         if (!res.ok) throw new Error(`Ping failed with status ${res.status}`);
         const end = performance.now();
@@ -83,7 +95,9 @@ function useNetworkInfo() {
     if (!values || !values.length) return null;
     const sorted = [...values].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    return sorted.length % 2 !== 0
+      ? sorted[mid]
+      : (sorted[mid - 1] + sorted[mid]) / 2;
   };
 
   const measureLatencyBurst = async (attempts = 5) => {
@@ -101,7 +115,10 @@ function useNetworkInfo() {
     if (!samples.length) return { latency: null, jitter: null };
     const min = Math.min(...samples);
     const max = Math.max(...samples);
-    return { latency: Math.round(median(samples)), jitter: Math.round(Math.max(0, max - min)) };
+    return {
+      latency: Math.round(median(samples)),
+      jitter: Math.round(Math.max(0, max - min)),
+    };
   };
 
   // Speed test function
@@ -131,9 +148,12 @@ function useNetworkInfo() {
 
       for (let i = 0; i < DOWNLOAD_SAMPLES; i++) {
         const downloadStart = performance.now();
-        const response = await fetch(`${downloadEndpoint}?bytes=${DOWNLOAD_BYTES}&cache=${Math.random()}`, {
-          cache: "no-store",
-        });
+        const response = await fetch(
+          `${downloadEndpoint}?bytes=${DOWNLOAD_BYTES}&cache=${Math.random()}`,
+          {
+            cache: "no-store",
+          }
+        );
         const blob = await response.blob();
         const downloadEnd = performance.now();
         const downloadTime = (downloadEnd - downloadStart) / 1000;
@@ -161,7 +181,8 @@ function useNetworkInfo() {
       } catch (postErr) {
         console.warn("Upload test POST failed, using estimate", postErr);
         const estimatedUpload = medianDownload ? medianDownload * 0.3 : null; // typical ratio
-        if (estimatedUpload) setUploadSpeed(Math.max(0.1, estimatedUpload).toFixed(2));
+        if (estimatedUpload)
+          setUploadSpeed(Math.max(0.1, estimatedUpload).toFixed(2));
         setSpeedTestStatus("complete");
         setSpeedTestProgress(100);
         return;
@@ -205,8 +226,10 @@ function useNetworkInfo() {
 
     // If the browser hides the link type but exposes a speed class (4G/3G/etc.), avoid showing the raw class.
     if (effectiveType) {
-      if (effectiveType === "4g" || effectiveType === "3g") return "Cellular (browser estimate)";
-      if (effectiveType === "2g" || effectiveType === "slow-2g") return "Very slow link (browser estimate)";
+      if (effectiveType === "4g" || effectiveType === "3g")
+        return "Cellular (browser estimate)";
+      if (effectiveType === "2g" || effectiveType === "slow-2g")
+        return "Very slow link (browser estimate)";
     }
 
     if (connectionType !== null && connectionType !== undefined) {

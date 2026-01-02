@@ -20,16 +20,26 @@ function NetworkInfo({ networkInfo }) {
 
   const isTestRunning = speedTestStatus === "running";
   const showResults = speedTestStatus !== "idle";
-  const isWifi = typeof connectionType === "string" && /wifi/i.test(connectionType);
+  const isWifi =
+    typeof connectionType === "string" && /wifi/i.test(connectionType);
   const statusClass =
-    linkStatus === "online" ? "status-symbol-green" : linkStatus === "offline" ? "status-symbol-red" : "status-symbol-off";
+    linkStatus === "online"
+      ? pingLatency && Number.isFinite(pingLatency) && pingLatency > 120
+        ? "status-symbol-amber"
+        : "status-symbol-green"
+      : linkStatus === "offline"
+        ? "status-symbol-red"
+        : "status-symbol-off";
   const resolvedLinkType = (() => {
     if (typeof connectionType === "string") {
       if (/wifi/i.test(connectionType)) return "Wi‑Fi";
       if (/ethernet/i.test(connectionType)) return "Ethernet";
       if (/cell/i.test(connectionType)) return "Cellular";
     }
-    if (effectiveTypeLabel && !/(estimate|unknown|unavailable)/i.test(effectiveTypeLabel)) {
+    if (
+      effectiveTypeLabel &&
+      !/(estimate|unknown|unavailable)/i.test(effectiveTypeLabel)
+    ) {
       return effectiveTypeLabel;
     }
     return null;
@@ -57,18 +67,33 @@ function NetworkInfo({ networkInfo }) {
     const uploadMbps = Number.parseFloat(uploadSpeed);
     const hasDownload = Number.isFinite(downloadMbps);
     const hasUpload = Number.isFinite(uploadMbps);
-    const bottleneck = Math.min(hasDownload ? downloadMbps : Infinity, hasUpload ? uploadMbps : Infinity);
+    const bottleneck = Math.min(
+      hasDownload ? downloadMbps : Infinity,
+      hasUpload ? uploadMbps : Infinity
+    );
 
     if (speedTestStatus === "error") {
-      return { headline: "Unable to score link", detail: "Re-run the test to rate overall speed.", tone: "muted" };
+      return {
+        headline: "Unable to score link",
+        detail: "Re-run the test to rate overall speed.",
+        tone: "muted",
+      };
     }
 
     if (speedTestStatus === "running") {
-      return { headline: "Measuring...", detail: "Waiting on both download and upload results.", tone: "muted" };
+      return {
+        headline: "Measuring...",
+        detail: "Waiting on both download and upload results.",
+        tone: "muted",
+      };
     }
 
     if (!hasDownload && !hasUpload) {
-      return { headline: "No results yet", detail: "Run the speed test to see an overall rating.", tone: "muted" };
+      return {
+        headline: "No results yet",
+        detail: "Run the speed test to see an overall rating.",
+        tone: "muted",
+      };
     }
 
     let headline;
@@ -78,15 +103,24 @@ function NetworkInfo({ networkInfo }) {
     else headline = "Slow";
 
     let detail = "Balanced for streaming, calls, and uploads.";
-    if (headline === "Fast") detail = "Comfortable for HD streaming, large syncs, and multi-user calls.";
-    if (headline === "Fair") detail = "OK for browsing and single HD streams; larger uploads will drag.";
-    if (headline === "Slow") detail = "Expect delays on video calls and cloud syncs.";
+    if (headline === "Fast")
+      detail =
+        "Comfortable for HD streaming, large syncs, and multi-user calls.";
+    if (headline === "Fair")
+      detail =
+        "OK for browsing and single HD streams; larger uploads will drag.";
+    if (headline === "Slow")
+      detail = "Expect delays on video calls and cloud syncs.";
 
     if (hasDownload && hasUpload) {
       if (downloadMbps < uploadMbps - 5) {
-        detail = `Download is the limiter (${downloadMbps.toFixed(1)} Mbps). ${detail}`;
+        detail = `Download is the limiter (${downloadMbps.toFixed(
+          1
+        )} Mbps). ${detail}`;
       } else if (uploadMbps < downloadMbps - 5) {
-        detail = `Upload is the limiter (${uploadMbps.toFixed(1)} Mbps). ${detail}`;
+        detail = `Upload is the limiter (${uploadMbps.toFixed(
+          1
+        )} Mbps). ${detail}`;
       } else {
         detail = `Download/Upload are balanced (${downloadSpeed} / ${uploadSpeed} Mbps). ${detail}`;
       }
@@ -100,22 +134,23 @@ function NetworkInfo({ networkInfo }) {
   };
 
   const speedEvaluation = getSpeedEvaluation();
+  const statusLabel =
+    linkStatus === "online"
+      ? `Connected${pingLatency ? ` · ${pingLatency}ms ping` : ""}`
+      : linkStatus === "offline"
+        ? "Disconnected"
+        : "Checking...";
 
   return (
     <div className="widget network-info">
       <div className="network-info__section">
-        <h3 className="network-info__title">Network</h3>
-        <div className="network-info__status">
-          <span className={`status-symbol ${statusClass}`}></span>
-          <div>
-          
-            <div className="network-info__value">
-              {linkStatus === "online"
-                ? `Connected${pingLatency ? ` · ${pingLatency}ms ping` : ""}`
-                : linkStatus === "offline"
-                  ? "Disconnected"
-                  : "Checking..."}
-            </div>
+        <div className="network-info__title-row">
+          <div className="network-info__title-left">
+            <span className={`status-symbol ${statusClass}`}></span>
+            <h3 className="network-info__title">Network</h3>
+          </div>
+          <div className="network-info__status network-info__status--inline">
+            <span className="network-info__value">{statusLabel}</span>
           </div>
         </div>
         {showLinkType && (
@@ -137,11 +172,15 @@ function NetworkInfo({ networkInfo }) {
         <p className="hidden network-info__note">{speedTestScope}</p>
         {(speedTestStatus === "idle" || speedTestStatus === "running") && (
           <button
-            className={`speed-test-btn ${isTestRunning ? "speed-test-btn--running" : ""}`}
+            className={`speed-test-btn ${
+              isTestRunning ? "speed-test-btn--running" : ""
+            }`}
             onClick={runSpeedTest}
             disabled={isTestRunning}
           >
-            {isTestRunning ? `Running... ${speedTestProgress}%` : "Run Speed Test (median of runs)"}
+            {isTestRunning
+              ? `Running... ${speedTestProgress}%`
+              : "Run Speed Test (median of runs)"}
           </button>
         )}
 
@@ -149,62 +188,88 @@ function NetworkInfo({ networkInfo }) {
           <div className="speed-test-results">
             <div className="speed-test-result">
               <span className="speed-test-label">Download:</span>
-              <span className={`speed-test-value metric metric--${getThroughputTone(Number.parseFloat(downloadSpeed))}`}>
+              <span
+                className={`speed-test-value metric metric--${getThroughputTone(
+                  Number.parseFloat(downloadSpeed)
+                )}`}
+              >
                 {downloadSpeed
                   ? `${downloadSpeed} Mbps`
                   : speedTestStatus === "error"
-                    ? "Failed"
-                    : "Testing..."}
+                  ? "Failed"
+                  : "Testing..."}
               </span>
             </div>
             <div className="speed-test-result">
               <span className="speed-test-label">Upload:</span>
-              <span className={`speed-test-value metric metric--${getThroughputTone(Number.parseFloat(uploadSpeed))}`}>
+              <span
+                className={`speed-test-value metric metric--${getThroughputTone(
+                  Number.parseFloat(uploadSpeed)
+                )}`}
+              >
                 {uploadSpeed
                   ? `${uploadSpeed} Mbps`
                   : speedTestStatus === "error"
-                    ? "Failed"
-                    : "Testing..."}
+                  ? "Failed"
+                  : "Testing..."}
               </span>
             </div>
             <div className="speed-test-result">
               <span className="speed-test-label">Latency (median):</span>
-              <span className={`speed-test-value metric metric--${getLatencyTone(Number.parseFloat(speedLatency))}`}>
+              <span
+                className={`speed-test-value metric metric--${getLatencyTone(
+                  Number.parseFloat(speedLatency)
+                )}`}
+              >
                 {speedLatency
                   ? `${speedLatency} ms`
                   : speedTestStatus === "error"
-                    ? "Failed"
-                    : "Testing..."}
+                  ? "Failed"
+                  : "Testing..."}
               </span>
               <span className="speed-test-subtext">
-                {speedJitter !== null && speedJitter !== undefined ? `Jitter: ${speedJitter} ms` : "Measuring jitter..."}
+                {speedJitter !== null && speedJitter !== undefined
+                  ? `Jitter: ${speedJitter} ms`
+                  : "Measuring jitter..."}
               </span>
             </div>
             <div className="speed-test-result">
               <span className="speed-test-label">Overall:</span>
-              <span className={`speed-test-value metric metric--${speedEvaluation?.tone || "muted"}`}>
+              <span
+                className={`speed-test-value metric metric--${
+                  speedEvaluation?.tone || "muted"
+                }`}
+              >
                 {speedEvaluation?.headline
                   ? speedEvaluation.headline
                   : speedTestStatus === "error"
-                    ? "Failed"
-                    : "Scoring..."}
+                  ? "Failed"
+                  : "Scoring..."}
               </span>
             </div>
           </div>
         )}
 
         {showResults && (
-          <div className={`value
-          `}>
-          
-            <div className="speed-test-eval__detail">{speedEvaluation.detail}</div>
+          <div
+            className={`value
+          `}
+          >
+            <div className="speed-test-eval__detail">
+              {speedEvaluation.detail}
+            </div>
           </div>
         )}
 
-        {speedTestError && <p className="network-info__error">{speedTestError}</p>}
+        {speedTestError && (
+          <p className="network-info__error">{speedTestError}</p>
+        )}
 
         {(speedTestStatus === "complete" || speedTestStatus === "error") && (
-          <button className="speed-test-btn speed-test-btn--secondary" onClick={runSpeedTest}>
+          <button
+            className="speed-test-btn speed-test-btn--secondary"
+            onClick={runSpeedTest}
+          >
             Test Again
           </button>
         )}

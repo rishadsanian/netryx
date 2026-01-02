@@ -7,12 +7,13 @@ function NavBar({ items, active, onSelect }) {
       <div className="navbar__rail">
         {items.map((item) => (
           <button
-            key={item}
-            className={`navbar__item ${active === item ? "is-active" : ""}`}
-            onClick={() => onSelect(item)}
+            key={item.key}
+            className={`navbar__item ${active === item.key ? "is-active" : ""} ${item.status === "soon" ? "is-soon" : ""}`}
+            onClick={() => onSelect(item.key)}
             type="button"
           >
-            {item}
+            <span className="navbar__label">{item.label}</span>
+            {item.status === "soon" && <span className="navbar__tag">Soon</span>}
           </button>
         ))}
       </div>

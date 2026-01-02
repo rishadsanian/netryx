@@ -40,20 +40,23 @@
 }
 
 .widget h2 {
-  font-size: 1.15rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--text-primary);
   text-align: left;
   margin: 0;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.8;
 }
 
 .widget .value {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: var(--accent-soft);
   background: var(--muted);
   border-radius: 12px;
-  padding: 12px 14px;
-  margin: 10px 0 12px 0;
+  padding: 10px 12px;
+  margin: 8px 0 10px 0;
   overflow-wrap: break-word;
   text-align: left;
   border: 1px solid rgba(255, 255, 255, 0.04);
@@ -61,6 +64,11 @@
 
 .widget .value:hover {
   background: rgba(255, 255, 255, 0.08);
+}
+
+.widget-detail {
+  width: 100%;
+  display: block;
 }
 
 .status-symbol {
@@ -82,6 +90,11 @@
   animation: glow-red 2.4s ease-in-out infinite;
 }
 
+.status-symbol-amber {
+  background: radial-gradient(circle, #ffbf47 40%, rgba(255, 191, 71, 0.35));
+  animation: glow-amber 2.4s ease-in-out infinite;
+}
+
 .status-symbol-off {
   background: radial-gradient(circle, #6b7584 40%, rgba(107, 117, 132, 0.35));
   animation: glow-muted 2.4s ease-in-out infinite;
@@ -97,6 +110,12 @@
   0% { box-shadow: 0 0 4px rgba(255, 94, 94, 0.35), 0 0 0 4px rgba(255, 94, 94, 0.06); }
   50% { box-shadow: 0 0 8px rgba(255, 94, 94, 0.6), 0 0 0 6px rgba(255, 94, 94, 0.1); }
   100% { box-shadow: 0 0 4px rgba(255, 94, 94, 0.35), 0 0 0 4px rgba(255, 94, 94, 0.06); }
+}
+
+@keyframes glow-amber {
+  0% { box-shadow: 0 0 4px rgba(255, 191, 71, 0.35), 0 0 0 4px rgba(255, 191, 71, 0.06); }
+  50% { box-shadow: 0 0 8px rgba(255, 191, 71, 0.6), 0 0 0 6px rgba(255, 191, 71, 0.1); }
+  100% { box-shadow: 0 0 4px rgba(255, 191, 71, 0.35), 0 0 0 4px rgba(255, 191, 71, 0.06); }
 }
 
 @keyframes glow-muted {
