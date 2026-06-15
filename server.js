@@ -49,6 +49,17 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocket.Server({ server });
 
+server.on("error", (error) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(
+      `Port ${PORT} is already in use. Stop the existing Netryx server or run with WS_PORT=<free-port> npm run server.`
+    );
+    process.exit(1);
+  }
+
+  throw error;
+});
+
 server.listen(PORT, HOST, () => {
   console.log(`Netryx server started on http://${HOST}:${PORT}`);
   console.log(`WebSocket latency stream available on ws://${HOST}:${PORT}`);
