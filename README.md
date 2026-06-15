@@ -26,15 +26,31 @@ npm install
 ```
 
 ## Run
+Start the full local dev stack:
+```
+npm run dev
+```
+This starts both the WebSocket latency server and the React app. The app opens at `http://localhost:3000` and begins showing IPs, latency, and client device details once the socket connects.
+
+For a production-style local server that can be exposed through a temporary public tunnel:
+```
+npm run build
+npm run server
+```
+This serves the built React app and the WebSocket latency stream from the same origin, defaulting to `http://127.0.0.1:55455`. Tunnel that single port when sharing a live preview.
+
+To run the two processes manually:
+
 1) Start the WebSocket server (default `ws://localhost:55455`):
 ```
-node server.js
+npm run server
 ```
 2) In another terminal start the React app:
 ```
 npm start
 ```
-The app opens at `http://localhost:3000` and begins showing IPs, latency, and client device details once the socket connects.
+
+Set `REACT_APP_PACKET_LATENCY_WS_URL` before starting React to point the latency widget at a different WebSocket endpoint.
 
 ## Navigation shells (roadmap)
 - Overview: Client device, IP, and latency dashboard (live today).
@@ -49,7 +65,8 @@ The app opens at `http://localhost:3000` and begins showing IPs, latency, and cl
 ## Endpoints
 - IPv4: `https://api.ipify.org?format=json`
 - IPv6: `https://api64.ipify.org?format=json`
-- WebSocket: `ws://localhost:55455`
+- Local dev WebSocket: `ws://localhost:55455`
+- Production WebSocket: same origin as the hosted app (`ws://` or `wss://`)
 
 ## Tech
 React, Node.js, ws, Chart.js, Axios, react-chartjs-2, websocket.

@@ -1,10 +1,19 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 // Defaults target an external endpoint for a real internet-path test.
 // Override with REACT_APP_SPEEDTEST_DOWNLOAD_URL / REACT_APP_SPEEDTEST_UPLOAD_URL if you prefer another host.
 const DEFAULT_DOWNLOAD_URL =
   "https://speed.cloudflare.com/__down?bytes=5000000"; // 5MB
 const DEFAULT_UPLOAD_URL = "https://speed.cloudflare.com/__up";
+
+const median = (values) => {
+  if (!values || !values.length) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 !== 0
+    ? sorted[mid]
+    : (sorted[mid - 1] + sorted[mid]) / 2;
+};
 
 function useNetworkInfo() {
   const [connectionType, setConnectionType] = useState(null);
@@ -91,16 +100,7 @@ function useNetworkInfo() {
     };
   }, []);
 
-  const median = (values) => {
-    if (!values || !values.length) return null;
-    const sorted = [...values].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 !== 0
-      ? sorted[mid]
-      : (sorted[mid - 1] + sorted[mid]) / 2;
-  };
-
-  const measureLatencyBurst = async (attempts = 5) => {
+  const measureLatencyBurst = useCallback(async (attempts = 5) => {
     const samples = [];
     for (let i = 0; i < attempts; i++) {
       const start = performance.now();
@@ -119,10 +119,10 @@ function useNetworkInfo() {
       latency: Math.round(median(samples)),
       jitter: Math.round(Math.max(0, max - min)),
     };
-  };
+  }, []);
 
   // Speed test function
-  const runSpeedTest = async () => {
+  const runSpeedTest = useCallback(async () => {
     setSpeedTestStatus("running");
     setSpeedTestProgress(0);
     setSpeedTestError(null);
@@ -206,7 +206,7 @@ function useNetworkInfo() {
       setDownloadSpeed(null);
       setUploadSpeed(null);
     }
-  };
+  }, [downloadEndpoint, measureLatencyBurst, uploadEndpoint]);
 
   // Auto-run a speed test once on mount to populate the widget without a click.
   useEffect(() => {

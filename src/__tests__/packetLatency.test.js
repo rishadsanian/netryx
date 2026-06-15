@@ -1,34 +1,35 @@
 import React from "react";
-import { render, screen, act, waitFor } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 
 const mockClose = jest.fn();
 
 jest.mock("websocket", () => {
-  const socket = {
-    onopen: null,
-    onmessage: null,
-    onclose: null,
-    onerror: null,
-    close: jest.fn(() => {
-      mockClose();
-      if (socket.onclose) socket.onclose();
-    }),
-    triggerOpen() {
-      if (this.onopen) this.onopen();
-    },
-    triggerMessage(data) {
-      if (this.onmessage) this.onmessage({ data });
-    },
-  };
+  function MockWebSocket() {
+    Object.assign(this, {
+      onopen: null,
+      onmessage: null,
+      onclose: null,
+      onerror: null,
+      close: jest.fn(() => {
+        mockClose();
+        if (this.onclose) this.onclose();
+      }),
+      triggerOpen() {
+        if (this.onopen) this.onopen();
+      },
+      triggerMessage(data) {
+        if (this.onmessage) this.onmessage({ data });
+      },
+    });
+  }
 
   return {
     __esModule: true,
-    w3cwebsocket: jest.fn(() => socket),
-    __socket: socket,
+    w3cwebsocket: jest.fn().mockImplementation(MockWebSocket),
   };
 });
 
-import { w3cwebsocket, __socket as mockSocket } from "websocket";
+import { w3cwebsocket } from "websocket";
 import PacketLatency from "../api/packetLatency";
 
 function TestComponent() {
@@ -43,15 +44,14 @@ function TestComponent() {
   );
 }
 
+const getMockSocket = () =>
+  w3cwebsocket.mock.instances[0];
+
 describe("PacketLatency", () => {
   beforeEach(() => {
     jest.useRealTimers();
     mockClose.mockClear();
-    mockSocket.onopen = null;
-    mockSocket.onmessage = null;
-    mockSocket.onclose = null;
-    mockSocket.onerror = null;
-    mockSocket.close.mockClear();
+    w3cwebsocket.mockClear();
   });
 
   afterEach(() => {
@@ -59,47 +59,39 @@ describe("PacketLatency", () => {
   });
 
   it("turns green on message, charts points, then marks red when stale", async () => {
-    const now = Date.now();
+    jest.useFakeTimers();
     render(<TestComponent />);
 
     await act(async () => Promise.resolve());
 
-    await waitFor(() => {
-      expect(w3cwebsocket).toHaveBeenCalled();
-      expect(typeof mockSocket.onopen).toBe("function");
-      expect(typeof mockSocket.onmessage).toBe("function");
-    });
+    expect(w3cwebsocket).toHaveBeenCalledWith("ws://localhost:55455");
+    expect(typeof getMockSocket().onopen).toBe("function");
+    expect(typeof getMockSocket().onmessage).toBe("function");
 
+    const mockSocket = getMockSocket();
+    mockSocket.close = jest.fn(mockClose);
     act(() => {
-      mockSocket.triggerOpen();
-      mockSocket.triggerMessage(`${now - 10}`);
+      mockSocket.onopen();
+      mockSocket.onmessage({ data: `${Date.now() - 10}` });
     });
 
-    await waitFor(() => {
-      expect(screen.getByTestId("status").textContent).toBe("green");
-      expect(screen.getByTestId("latency").textContent).toBe("10");
-    });
-
-    jest.useFakeTimers();
+    expect(screen.getByTestId("status").textContent).toBe("green");
+    expect(screen.getByTestId("latency").textContent).toBe("10");
 
     act(() => {
       jest.advanceTimersByTime(1000);
     });
 
-    await waitFor(() => {
-      expect(screen.getByTestId("points").textContent).toBe("1");
-      expect(screen.getByTestId("labels").textContent).toBe("1");
-    });
+    expect(screen.getByTestId("points").textContent).toBe("1");
+    expect(screen.getByTestId("labels").textContent).toBe("1");
 
     act(() => {
       jest.advanceTimersByTime(6000);
     });
 
-    await waitFor(() => {
-      expect(screen.getByTestId("status").textContent).toBe("red");
-      expect(screen.getByTestId("latency").textContent).toBe("");
-      expect(mockClose).toHaveBeenCalled();
-      expect(mockSocket.close).toHaveBeenCalled();
-    });
+    expect(screen.getByTestId("status").textContent).toBe("red");
+    expect(screen.getByTestId("latency").textContent).toBe("");
+    expect(mockClose).toHaveBeenCalled();
+    expect(mockSocket.close).toHaveBeenCalled();
   });
 });

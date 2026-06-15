@@ -4,6 +4,18 @@ import { w3cwebsocket } from "websocket";
 const STALE_THRESHOLD_MS = 5000;
 const RECONNECT_DELAY_MS = 2000;
 const MAX_POINTS = 120;
+const getSocketUrl = () => {
+  if (process.env.REACT_APP_PACKET_LATENCY_WS_URL) {
+    return process.env.REACT_APP_PACKET_LATENCY_WS_URL;
+  }
+
+  if (process.env.NODE_ENV === "production" && typeof window !== "undefined") {
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    return `${protocol}//${window.location.host}`;
+  }
+
+  return "ws://localhost:55455";
+};
 
 function PacketLatency() {
   const [latency, setLatency] = useState(null);
@@ -37,7 +49,7 @@ function PacketLatency() {
     };
 
     const connect = () => {
-      const client = new w3cwebsocket("ws://localhost:55455");
+      const client = new w3cwebsocket(getSocketUrl());
       socketRef.current = client;
 
       client.onopen = () => {
@@ -109,7 +121,7 @@ function PacketLatency() {
         latencyRef.current = null;
         setLatency(null);
         setLatencyStatus("red");
-        if (socketRef.current) {
+        if (socketRef.current && typeof socketRef.current.close === "function") {
           socketRef.current.close();
         }
       }

@@ -20,8 +20,6 @@ function NetworkInfo({ networkInfo }) {
 
   const isTestRunning = speedTestStatus === "running";
   const showResults = speedTestStatus !== "idle";
-  const isWifi =
-    typeof connectionType === "string" && /wifi/i.test(connectionType);
   const statusClass =
     linkStatus === "online"
       ? pingLatency && Number.isFinite(pingLatency) && pingLatency > 120
