@@ -4,12 +4,16 @@ import { render, screen, act } from "@testing-library/react";
 const mockClose = jest.fn();
 
 jest.mock("websocket", () => {
-  function MockWebSocket() {
-    Object.assign(this, {
+  let socket;
+
+  function createSocket() {
+    socket = {
       onopen: null,
       onmessage: null,
       onclose: null,
       onerror: null,
+      readyState: 0,
+      send: jest.fn(),
       close: jest.fn(() => {
         mockClose();
         if (this.onclose) this.onclose();
@@ -20,12 +24,15 @@ jest.mock("websocket", () => {
       triggerMessage(data) {
         if (this.onmessage) this.onmessage({ data });
       },
-    });
+    };
+
+    return socket;
   }
 
   return {
     __esModule: true,
-    w3cwebsocket: jest.fn().mockImplementation(MockWebSocket),
+    w3cwebsocket: jest.fn().mockImplementation(createSocket),
+    __getSocket: () => socket,
   };
 });
 
@@ -45,7 +52,7 @@ function TestComponent() {
 }
 
 const getMockSocket = () =>
-  w3cwebsocket.mock.instances[0];
+  w3cwebsocket.mock.results[0]?.value || w3cwebsocket.mock.instances[0];
 
 describe("PacketLatency", () => {
   beforeEach(() => {
@@ -70,13 +77,21 @@ describe("PacketLatency", () => {
 
     const mockSocket = getMockSocket();
     mockSocket.close = jest.fn(mockClose);
+    mockSocket.send = jest.fn();
     act(() => {
+      mockSocket.readyState = 1;
       mockSocket.onopen();
-      mockSocket.onmessage({ data: `${Date.now() - 10}` });
+      const ping = JSON.parse(mockSocket.send.mock.calls[0][0]);
+      mockSocket.onmessage({
+        data: JSON.stringify({ ...ping, sentAt: Date.now() - 10 }),
+      });
     });
 
     expect(screen.getByTestId("status").textContent).toBe("green");
     expect(screen.getByTestId("latency").textContent).toBe("10");
+    expect(mockSocket.send).toHaveBeenCalledWith(
+      expect.stringContaining('"type":"latency-ping"')
+    );
 
     act(() => {
       jest.advanceTimersByTime(1000);

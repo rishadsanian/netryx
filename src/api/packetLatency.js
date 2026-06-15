@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { w3cwebsocket } from "websocket";
 
 const STALE_THRESHOLD_MS = 5000;
+const PING_INTERVAL_MS = 1000;
 const RECONNECT_DELAY_MS = 2000;
 const MAX_POINTS = 120;
+const SOCKET_OPEN = 1;
 const getSocketUrl = () => {
   if (process.env.REACT_APP_PACKET_LATENCY_WS_URL) {
     return process.env.REACT_APP_PACKET_LATENCY_WS_URL;
@@ -27,10 +29,36 @@ function PacketLatency() {
   const latencyRef = useRef(null);
   const lastMessageRef = useRef(null);
   const socketRef = useRef(null);
+  const pingTimerRef = useRef(null);
   const reconnectTimerRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
+
+    const stopPinging = () => {
+      if (pingTimerRef.current) {
+        clearInterval(pingTimerRef.current);
+        pingTimerRef.current = null;
+      }
+    };
+
+    const sendPing = () => {
+      const socket = socketRef.current;
+      if (!socket || socket.readyState !== SOCKET_OPEN) return;
+
+      socket.send(
+        JSON.stringify({
+          type: "latency-ping",
+          sentAt: Date.now(),
+        })
+      );
+    };
+
+    const startPinging = () => {
+      stopPinging();
+      sendPing();
+      pingTimerRef.current = setInterval(sendPing, PING_INTERVAL_MS);
+    };
 
     const scheduleReconnect = () => {
       if (reconnectTimerRef.current) return;
@@ -42,6 +70,7 @@ function PacketLatency() {
 
     const handleClose = () => {
       if (!isMounted) return;
+      stopPinging();
       latencyRef.current = null;
       setLatency(null);
       setLatencyStatus("red");
@@ -55,15 +84,27 @@ function PacketLatency() {
       client.onopen = () => {
         if (!isMounted) return;
         setLatencyStatus("green");
+        startPinging();
       };
 
       client.onmessage = (message) => {
         if (!isMounted) return;
-        const timestamp = parseInt(message.data, 10);
         const currentTime = Date.now();
+        let payload;
+
+        try {
+          payload = JSON.parse(message.data);
+        } catch (err) {
+          return;
+        }
+
+        if (payload?.type !== "latency-ping" || !Number.isFinite(payload.sentAt)) {
+          return;
+        }
+
         lastMessageRef.current = currentTime;
         setCurrentTimestamp(currentTime);
-        const packetLatency = currentTime - timestamp;
+        const packetLatency = Math.max(0, currentTime - payload.sentAt);
         latencyRef.current = packetLatency;
         setLatency(packetLatency);
         setLatencyStatus("green");
@@ -72,7 +113,9 @@ function PacketLatency() {
       client.onerror = () => {
         if (!isMounted) return;
         setLatencyStatus("red");
-        client.close();
+        if (typeof client.close === "function") {
+          client.close();
+        }
       };
 
       client.onclose = handleClose;
@@ -82,6 +125,7 @@ function PacketLatency() {
 
     return () => {
       isMounted = false;
+      stopPinging();
       if (socketRef.current) {
         socketRef.current.onclose = null;
         if (typeof socketRef.current.close === "function") {
@@ -118,6 +162,10 @@ function PacketLatency() {
       if (!lastMessageAt) return;
       const isStale = Date.now() - lastMessageAt > STALE_THRESHOLD_MS;
       if (isStale) {
+        if (pingTimerRef.current) {
+          clearInterval(pingTimerRef.current);
+          pingTimerRef.current = null;
+        }
         latencyRef.current = null;
         setLatency(null);
         setLatencyStatus("red");

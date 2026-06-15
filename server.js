@@ -68,14 +68,13 @@ server.listen(PORT, HOST, () => {
 wss.on("connection", (ws) => {
   console.log("Client connected");
 
-  // Send a timestamp every second
-  const interval = setInterval(() => {
-    const timestamp = Date.now();
-    ws.send(timestamp.toString());
-  }, 1000);
+  ws.on("message", (message) => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(message.toString());
+    }
+  });
 
   ws.on("close", () => {
     console.log("Client disconnected");
-    clearInterval(interval);
   });
 });
